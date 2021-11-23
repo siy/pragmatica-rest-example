@@ -46,7 +46,6 @@ public sealed interface Result<T> permits Success, Failure {
      * unchanged and transformation function is not invoked.
      *
      * @param mapper Function to transform successful value
-     *
      * @return transformed value (in case of success) or current instance (in case of failure)
      */
     @SuppressWarnings("unchecked")
@@ -60,7 +59,6 @@ public sealed interface Result<T> permits Success, Failure {
      * and value remains the same.
      *
      * @param mapper Function to apply to result
-     *
      * @return transformed value (in case of success) or current instance (in case of failure)
      */
     @SuppressWarnings("unchecked")
@@ -74,7 +72,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param failureConsumer Consumer for failure result
      * @param successConsumer Consumer for success result
-     *
      * @return current instance
      */
     default Result<T> apply(Consumer<? super Cause> failureConsumer, Consumer<? super T> successConsumer) {
@@ -91,7 +88,6 @@ public sealed interface Result<T> permits Success, Failure {
      * Pass successful operation result value into provided consumer.
      *
      * @param consumer Consumer to pass value to
-     *
      * @return current instance for fluent call chaining
      */
     default Result<T> onSuccess(Consumer<T> consumer) {
@@ -105,6 +101,7 @@ public sealed interface Result<T> permits Success, Failure {
     /**
      * Run provided action in case of success.
      *
+     * @param action action to run
      * @return current instance for fluent call chaining
      */
     default Result<T> onSuccessDo(Runnable action) {
@@ -119,7 +116,6 @@ public sealed interface Result<T> permits Success, Failure {
      * Pass failure operation result value into provided consumer.
      *
      * @param consumer Consumer to pass value to
-     *
      * @return current instance for fluent call chaining
      */
     default Result<T> onFailure(Consumer<? super Cause> consumer) {
@@ -133,6 +129,7 @@ public sealed interface Result<T> permits Success, Failure {
     /**
      * Run provided action in case of failure.
      *
+     * @param action action to run
      * @return current instance for fluent call chaining
      */
     default Result<T> onFailureDo(Runnable action) {
@@ -140,6 +137,17 @@ public sealed interface Result<T> permits Success, Failure {
             action.run();
             return null;
         }, v -> null);
+        return this;
+    }
+
+    /**
+     * Run provided action regardless from the success or failure.
+     *
+     * @param action action to run
+     * @return current instance for fluent call chaining
+     */
+    default Result<T> onResultDo(Runnable action) {
+        action.run();
         return this;
     }
 
@@ -192,7 +200,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param cause     failure to use in case if predicate returns {@code false}
      * @param predicate predicate to invoke
-     *
      * @return current instance if predicate returns {@code true} or {@link Failure} instance if predicate returns {@code false}
      */
     default Result<T> filter(Cause cause, Predicate<T> predicate) {
@@ -206,7 +213,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param causeMapper function which transforms the tested value into instance of {@link Cause} if predicate returns {@code false}
      * @param predicate   predicate to invoke
-     *
      * @return current instance if predicate returns {@code true} or {@link Failure} instance if predicate returns {@code false}
      */
     default Result<T> filter(FN1<Cause, T> causeMapper, Predicate<T> predicate) {
@@ -218,7 +224,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param failureMapper function to transform failure into value
      * @param successMapper function to transform success into value
-     *
      * @return result of application of one of the mappers.
      */
     <R> R fold(FN1<? extends R, ? super Cause> failureMapper, FN1<? extends R, ? super T> successMapper);
@@ -227,7 +232,6 @@ public sealed interface Result<T> permits Success, Failure {
      * Create an instance of successful operation result.
      *
      * @param value Operation result
-     *
      * @return created instance
      */
     static <R> Result<R> success(R value) {
@@ -270,7 +274,6 @@ public sealed interface Result<T> permits Success, Failure {
      * Create an instance of failure result.
      *
      * @param value Operation error value
-     *
      * @return created instance
      */
     static <R> Result<R> failure(Cause value) {
@@ -315,7 +318,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param exceptionMapper the function which will transform exception into instance of {@link Cause}
      * @param supplier        the call to wrap
-     *
      * @return result of execution of the provided lambda wrapped into {@link Result}
      */
     static <R> Result<R> lift(FN1<? extends Cause, ? super Throwable> exceptionMapper, ThrowingSupplier<R> supplier) {
@@ -330,7 +332,6 @@ public sealed interface Result<T> permits Success, Failure {
      * Transform list of {@link Result} instances into {@link Result} with list of values.
      *
      * @param resultList input list
-     *
      * @return success instance if all {@link Result} instances in list are successes or
      * failure instance with any instances in list is a failure
      */
@@ -348,7 +349,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param first   first input result
      * @param results remaining input results
-     *
      * @return first success instance among provided
      */
     @SafeVarargs
@@ -371,7 +371,6 @@ public sealed interface Result<T> permits Success, Failure {
      *
      * @param first     first instance to check
      * @param suppliers suppliers which provide remaining instances for check
-     *
      * @return first success instance among provided
      */
     @SafeVarargs
